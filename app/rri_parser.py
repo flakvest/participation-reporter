@@ -1,6 +1,6 @@
 import re
 
-from app.schemas import ParsedReport
+from app.schemas import MONTH_ORDER, ParsedReport, infer_year
 
 FIELD_DEFS_PLATOON = [
     ("Call Sign", "X"),
@@ -90,10 +90,12 @@ def parse_text(text: str) -> list[tuple[ParsedReport | None, list[str]]]:
         else:
             set_id = raw.split("/")[0].strip().upper()
             platoon = "1PLT" if set_id == "1PLTPARTRPT" else "2PLT"
+            month_val = field_values[1].upper()
             report = ParsedReport(
                 platoon=platoon,
                 callsign=field_values[0].upper(),
-                month=field_values[1].upper(),
+                month=month_val,
+                year=infer_year(month_val),
                 equipment_ok=field_values[2].upper(),
                 skills_ok=field_values[3].upper(),
                 total_hf_hours=int(field_values[4]),

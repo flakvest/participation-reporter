@@ -26,6 +26,7 @@ class Report(Base):
     platoon: Mapped[str] = mapped_column(String(10), nullable=False, index=True)
     callsign: Mapped[str] = mapped_column(String(10), nullable=False, index=True)
     month: Mapped[str] = mapped_column(String(3), nullable=False)
+    year: Mapped[int] = mapped_column(Integer, nullable=False, default=2026)
 
     equipment_ok: Mapped[str] = mapped_column(String(3), nullable=False)
     skills_ok: Mapped[str] = mapped_column(String(3), nullable=False)

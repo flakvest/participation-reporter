@@ -2,12 +2,40 @@
 {% block title %}Dashboard — MARS Reporter{% endblock %}
 {% block content %}
 <h1 style="margin-bottom: 0.5rem;">Dashboard</h1>
-<p style="color: #666; margin-bottom: 1.5rem;">
+<p style="color: #666; margin-bottom: 1rem;">
     Welcome, {{ user.callsign }}.
     {% if user.role == "admin" %}You have full access.
     {% elif user.role == "platoon_leader" %}You can see all {{ user.platoon }} members.
     {% else %}Viewing your own reports.{% endif %}
 </p>
+
+<div class="card">
+    <form method="GET" action="/dashboard">
+        <div class="filters">
+            <div class="filter-group">
+                <label>Year</label>
+                <select name="year">
+                    {% for y in years %}
+                    <option value="{{ y }}" {% if selected_year == y|string %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Month</label>
+                <select name="month">
+                    <option value="">All</option>
+                    {% for m in months %}
+                    <option value="{{ m }}" {% if selected_month == m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-secondary btn-sm">Go</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 <div class="summary-cards">
     <div class="summary-card">
@@ -28,7 +56,12 @@
     </div>
 </div>
 
-<h2 style="margin-bottom: 0.75rem;">Status by Callsign</h2>
+<h2 style="margin-bottom: 0.75rem;">
+    Status
+    {% if selected_month %}for {{ selected_month }}{% endif %}
+    {{ selected_year }}
+</h2>
+
 <div class="status-grid">
     {% for item in report_list %}
     {% set ind = "green" if item.has_submitted else "red" %}
@@ -38,7 +71,7 @@
         <span class="platoon badge badge-plt">{{ item.platoon }}</span>
         <span class="detail">
             {% if item.has_submitted %}
-                {{ item.last_report }} submitted
+                {{ item.last_report }} {{ item.last_report_year }}
             {% else %}
                 No report
             {% endif %}

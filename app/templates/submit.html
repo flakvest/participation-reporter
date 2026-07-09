@@ -16,6 +16,9 @@
     </div>
     {% for r in successes %}
     <div class="strip-preview">{{ r.raw_strip }}</div>
+    <p style="font-size: 0.8rem; color: #666; margin-top: -0.5rem; margin-bottom: 0.75rem;">
+        → {{ r.platoon }} / {{ r.callsign }} / {{ r.month }} {{ r.year }}
+    </p>
     {% endfor %}
     {% endif %}
     {% if errors %}

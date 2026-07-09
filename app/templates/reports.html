@@ -17,6 +17,15 @@
                 </select>
             </div>
             <div class="filter-group">
+                <label>Year</label>
+                <select name="year">
+                    <option value="">All</option>
+                    {% for y in years %}
+                    <option value="{{ y }}" {% if filter_year == y|string %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
                 <label>Month</label>
                 <select name="month">
                     <option value="">All</option>
@@ -42,14 +51,14 @@
 <div class="card" style="overflow-x: auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
         <span style="font-size: 0.85rem; color: #666;">{{ reports|length }} report(s)</span>
-        <a href="/reports/export?platoon={{ filter_platoon }}&month={{ filter_month }}&callsign={{ filter_callsign }}" class="btn btn-outline btn-sm">Export CSV</a>
+        <a href="/reports/export?platoon={{ filter_platoon }}&month={{ filter_month }}&year={{ filter_year }}&callsign={{ filter_callsign }}" class="btn btn-outline btn-sm">Export CSV</a>
     </div>
     <table>
         <thead>
             <tr>
                 <th>Platoon</th>
                 <th>Callsign</th>
-                <th>Month</th>
+                <th>Period</th>
                 <th>Equip OK</th>
                 <th>Skills OK</th>
                 <th>HF Hrs</th>
@@ -67,7 +76,7 @@
             <tr>
                 <td><span class="badge badge-plt">{{ r.platoon }}</span></td>
                 <td><strong>{{ r.callsign }}</strong></td>
-                <td>{{ r.month }}</td>
+                <td>{{ r.month }} {{ r.year }}</td>
                 <td><span class="badge {{ 'badge-ok' if r.equipment_ok == 'YES' else 'badge-no' }}">{{ r.equipment_ok }}</span></td>
                 <td><span class="badge {{ 'badge-ok' if r.skills_ok == 'YES' else 'badge-no' }}">{{ r.skills_ok }}</span></td>
                 <td>{{ r.total_hf_hours }}</td>

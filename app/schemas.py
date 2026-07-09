@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from pydantic import BaseModel, field_validator
@@ -49,10 +49,23 @@ class LoginRequest(BaseModel):
     password: str
 
 
+MONTH_ORDER = {"JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12}
+
+
+def infer_year(month: str) -> int:
+    now = datetime.now(timezone.utc)
+    current_month_num = now.month
+    reported_month_num = MONTH_ORDER.get(month.upper(), 0)
+    if reported_month_num > current_month_num:
+        return now.year - 1
+    return now.year
+
+
 class ParsedReport(BaseModel):
     platoon: str
     callsign: str
     month: str
+    year: int = 2026
     equipment_ok: str
     skills_ok: str
     total_hf_hours: int
@@ -69,6 +82,7 @@ class ReportOut(BaseModel):
     platoon: str
     callsign: str
     month: str
+    year: int
     equipment_ok: str
     skills_ok: str
     total_hf_hours: int
