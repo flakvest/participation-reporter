@@ -27,7 +27,15 @@ Same for 2PLTPARTRPT.
 - Set identifier must be exactly `1PLTPARTRPT` or `2PLTPARTRPT`
 - YES/NO fields validated against allowed values
 - Hour fields (`#` mask) validated as numeric
-- Duplicate detection: same callsign + same month + same platoon = flag as duplicate
+- Duplicate detection: same callsign + same month + same year + same platoon = flag as duplicate
+
+### Year Inference
+
+The RRI strip contains `Month(JAN,FEB,...)` but no year field. The year is auto-inferred from the submission date:
+- If reported month is later than the current month (e.g., reporting DEC in JAN), the year is set to previous year
+- Otherwise, the year is set to the current year
+
+This means someone submitting in July 2026 with Month=JUN gets year=2026. Someone submitting in January 2026 with Month=DEC gets year=2025.
 
 ## 3. Submission Methods
 
@@ -70,21 +78,22 @@ An authenticated POST endpoint so automated systems can push strips directly.
 - **totp_enabled** (boolean, default false) — whether 2FA is active
 
 ### Reports table
-- id, platoon, callsign, month, equipment_ok (bool), skills_ok (bool),
+- id, platoon, callsign, month, **year** (int, auto-inferred),
+  equipment_ok (bool), skills_ok (bool),
   total_hf_hours (int), j0g_hours (int), gst_hours (int), other_hf_hours (int),
   total_mars_hours (int), notes (text), source (file_upload|paste|api),
   duplicate_flag (bool), created_at, submitted_by (user_id)
 
 ### Unique constraint
-- (platoon, callsign, month) — one report per callsign per platoon per month
+- (platoon, callsign, month, year) — flag as duplicate if same entry exists
 
 ## 6. Features
 
 ### Dashboard Views
-- **Per-platoon summary**: how many operators have reported this month vs outstanding
-- **Monthly rollup**: what % of platoon submitted each month
+- **Per-platoon summary**: how many operators have reported for a selected month+year vs outstanding
+- **Month/Year filter**: platoon leaders pick the period to view
 - **Individual operator history**: all submissions for a given callsign over time
-- **Export to CSV**: filtered by platoon, month, date range
+- **Export to CSV**: filtered by platoon, month, year, callsign
 
 ### Report Management
 - View submitted reports (filterable by platoon, month, callsign)
