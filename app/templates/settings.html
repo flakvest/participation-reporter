@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Settings — MARS Reporter{% endblock %}
+{% block content %}
+<h1 style="margin-bottom: 1rem;">Settings</h1>
+
+{% if success_2fa %}
+<div class="alert alert-success">{{ success_2fa }}</div>
+{% endif %}
+{% if error_2fa %}
+<div class="alert alert-error">{{ error_2fa }}</div>
+{% endif %}
+
+<div class="card">
+    <h2>Two-Factor Authentication</h2>
+    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
+        Add an extra layer of security using a TOTP app like Google Authenticator or Authy.
+    </p>
+
+    {% if user.totp_enabled %}
+    <div class="alert alert-success" style="display: inline-block;">
+        2FA is <strong>enabled</strong>
+    </div>
+    <div style="margin-top: 1rem;">
+        <details>
+            <summary style="cursor: pointer; color: #c0392b; font-weight: 600;">Disable 2FA</summary>
+            <div style="margin-top: 0.75rem; padding: 1rem; background: #fff5f5; border-radius: 6px;">
+                <p style="font-size: 0.85rem; margin-bottom: 0.75rem;">Enter your current TOTP code to disable two-factor authentication.</p>
+                <form method="POST" action="/settings/2fa/disable" style="display: flex; gap: 0.5rem; align-items: end;">
+                    <div>
+                        <label for="code">TOTP Code</label>
+                        <input type="text" id="code" name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" required style="width: 160px;">
+                    </div>
+                    <button type="submit" class="btn btn-outline btn-sm" style="border-color: #c0392b; color: #c0392b;">Disable</button>
+                </form>
+            </div>
+        </details>
+    </div>
+
+    {% elif pending_enable %}
+    <div style="background: #f0f8ff; border: 1px solid #cce5ff; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem;">
+        <h3 style="margin-bottom: 0.75rem;">Step 1: Scan QR Code</h3>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.75rem;">
+            Scan this QR code with your authenticator app, or manually enter the secret key below.
+        </p>
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <img src="data:image/png;base64,{{ qr_data }}" alt="TOTP QR Code" style="border: 2px solid #ddd; border-radius: 8px;">
+        </div>
+        <p style="font-size: 0.8rem; color: #666; text-align: center;">
+            Secret key: <code style="background: #eee; padding: 0.2rem 0.4rem; border-radius: 4px; user-select: all;">{{ totp_secret }}</code>
+        </p>
+    </div>
+
+    <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem;">
+        <h3 style="margin-bottom: 0.75rem;">Step 2: Verify Code</h3>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 0.75rem;">
+            Enter the 6-digit code from your authenticator app to enable 2FA.
+        </p>
+        <form method="POST" action="/settings/2fa/verify" style="display: flex; gap: 0.5rem; align-items: end;">
+            <div>
+                <label for="code">TOTP Code</label>
+                <input type="text" id="code" name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" required style="width: 160px;">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Verify & Enable</button>
+        </form>
+    </div>
+
+    {% else %}
+    <form method="POST" action="/settings/2fa/enable">
+        <button type="submit" class="btn btn-primary">Enable Two-Factor Authentication</button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Account</h2>
+    <table style="width: auto;">
+        <tr><td style="font-weight: 600; padding-right: 2rem;">Callsign</td><td>{{ user.callsign }}</td></tr>
+        <tr><td style="font-weight: 600;">Platoon</td><td>{{ user.platoon }}</td></tr>
+        <tr><td style="font-weight: 600;">Role</td><td>{{ user.role }}</td></tr>
+    </table>
+</div>
+{% endblock %}

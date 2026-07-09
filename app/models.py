@@ -14,6 +14,8 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
     platoon: Mapped[str] = mapped_column(String(10), nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False, default="operator")
+    totp_secret: Mapped[str] = mapped_column(String(32), nullable=True, default=None)
+    totp_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

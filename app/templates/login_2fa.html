@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Two-Factor Auth — MARS Reporter{% endblock %}
+{% block content %}
+<div style="max-width: 420px; margin: 4rem auto;">
+    <div class="card">
+        <h2>Two-Factor Authentication</h2>
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
+            Enter the 6-digit code from your authenticator app for <strong>{{ callsign }}</strong>.
+        </p>
+        {% if error %}
+            <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+        <form method="POST" action="/login/2fa">
+            <label for="code">Authentication Code</label>
+            <input type="text" id="code" name="code" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="000000" required autofocus>
+            <button type="submit" class="btn btn-primary" style="width:100%">Verify</button>
+        </form>
+        <p style="margin-top: 1rem; font-size: 0.85rem; text-align: center;">
+            <a href="/login" style="color: #666;">Back to login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

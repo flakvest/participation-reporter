@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
+import bcrypt as _bcrypt
+import pyotp
 from fastapi import Depends, HTTPException, Request, status
 from jose import JWTError, jwt
-import bcrypt as _bcrypt
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -11,6 +12,7 @@ from app.database import get_db
 from app.models import User
 
 ALGORITHM = "HS256"
+TOTP_ISSUER = "MARS Reporter"
 
 
 def verify_password(plain: str, hashed: str) -> bool:
@@ -53,13 +55,6 @@ def create_user(db: Session, callsign: str, password: str, platoon: str, role: s
     return user
 
 
-def get_current_user_from_token(token: str) -> Optional[dict]:
-    payload = decode_token(token)
-    if payload is None:
-        return None
-    return payload
-
-
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> Optional[User]:
     token = request.cookies.get("access_token")
     if not token:
@@ -77,3 +72,16 @@ def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     return user
+
+
+def generate_totp_secret() -> str:
+    return pyotp.random_base32()
+
+
+def get_totp_uri(secret: str, callsign: str) -> str:
+    return pyotp.totp.TOTP(secret).provisioning_uri(name=callsign, issuer_name=TOTP_ISSUER)
+
+
+def verify_totp(secret: str, code: str) -> bool:
+    totp = pyotp.TOTP(secret)
+    return totp.verify(code, valid_window=1)
