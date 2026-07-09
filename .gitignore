@@ -3,4 +3,4 @@ __pycache__/
 .env
 data/
 *.db
-.claude/
+.opencode/
