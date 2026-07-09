@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Submit Report — MARS Reporter{% endblock %}
+{% block content %}
+<h1 style="margin-bottom: 0.5rem;">Submit Report</h1>
+<p style="color: #666; margin-bottom: 1.5rem;">
+    Submit your Platoon Participation Report as an RRI response strip.
+    Paste the strip(s) below or upload a text file exported from Response Collector.
+</p>
+
+{% if successes or errors %}
+<div class="card">
+    <h2>Results</h2>
+    {% if successes %}
+    <div class="alert alert-success">
+        {{ successes|length }} report(s) processed successfully.
+    </div>
+    {% for r in successes %}
+    <div class="strip-preview">{{ r.raw_strip }}</div>
+    {% endfor %}
+    {% endif %}
+    {% if errors %}
+    <div class="alert alert-error">
+        <strong>{{ errors|length }} error(s):</strong>
+        <ul style="margin: 0.5rem 0 0 1.25rem;">
+            {% for e in errors %}
+            <li>{{ e }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="submit-methods">
+    <div class="card">
+        <h2>Paste Strips</h2>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">
+            Paste one or more RRI response strips. Multiple strips accepted (consolidation messages).
+        </p>
+        <form method="POST" action="/submit">
+            <label for="strip_text">RRI Response Strip(s)</label>
+            <textarea id="strip_text" name="strip_text" rows="8" placeholder="1PLTPARTRPT/AAR4XX/JAN/YES/YES/12/5/3/2/22/Training notes here//" style="font-family: 'Courier New', monospace; font-size: 0.85rem;"></textarea>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Upload File</h2>
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">
+            Upload a .txt or .csv file exported from Response Collector.
+        </p>
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+            <label for="file">Select File</label>
+            <input type="file" id="file" name="file" accept=".txt,.csv" required>
+            <button type="submit" class="btn btn-primary">Upload & Process</button>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 1rem;">
+    <h2>RRI Format Reference</h2>
+    <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+        <strong>1PLTPARTRPT</strong> (same format for 2PLTPARTRPT):
+    </p>
+    <div class="strip-preview">1PLTPARTRPT/Call Sign(X)/Month(JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC)/All MARS Equipment and Software Operational(YES,NO)/Possess Required MARS Skills(YES,NO)/Total HF Operational Hours(#)/J0G Hours in the HF Total(#)/GST or Message Center Hours in the HF Total(#)/Other HF hours including AFMARS or other regions and SHARES in the HF Total(#)/Sum of Total HF Operational Hours plus other MARS Hours such as Admin and Training and Equip maintenance(#)/Notes and Training Needs(X)//</div>
+    <p style="font-size: 0.85rem; margin-top: 0.5rem;">
+        Example response: <code>1PLTPARTRPT/AAR4XX/JAN/YES/YES/12/5/3/2/22/Additional training on M110A needed//</code>
+    </p>
+</div>
+{% endblock %}

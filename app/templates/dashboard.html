@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — MARS Reporter{% endblock %}
+{% block content %}
+<h1 style="margin-bottom: 0.5rem;">Dashboard</h1>
+<p style="color: #666; margin-bottom: 1.5rem;">
+    Welcome, {{ user.callsign }}.
+    {% if user.role == "admin" %}You have full access.
+    {% elif user.role == "platoon_leader" %}You can see all {{ user.platoon }} members.
+    {% else %}Viewing your own reports.{% endif %}
+</p>
+
+<div class="summary-cards">
+    <div class="summary-card">
+        <div class="number">{{ total_members }}</div>
+        <div class="label">Total Members</div>
+    </div>
+    <div class="summary-card">
+        <div class="number" style="color: #28a745;">{{ submitted_count }}</div>
+        <div class="label">Submitted</div>
+    </div>
+    <div class="summary-card">
+        <div class="number" style="color: {% if missing_count > 0 %}#dc3545{% else %}#28a745{% endif %};">{{ missing_count }}</div>
+        <div class="label">Outstanding</div>
+    </div>
+    <div class="summary-card">
+        <div class="number">{{ submission_pct }}%</div>
+        <div class="label">Submission Rate</div>
+    </div>
+</div>
+
+<h2 style="margin-bottom: 0.75rem;">Status by Callsign</h2>
+<div class="status-grid">
+    {% for item in report_list %}
+    {% set ind = "green" if item.has_submitted else "red" %}
+    <div class="status-card">
+        <span class="indicator {{ ind }}"></span>
+        <span class="callsign">{{ item.callsign }}</span>
+        <span class="platoon badge badge-plt">{{ item.platoon }}</span>
+        <span class="detail">
+            {% if item.has_submitted %}
+                {{ item.last_report }} submitted
+            {% else %}
+                No report
+            {% endif %}
+        </span>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 2rem; text-align: center;">
+    <a href="/submit" class="btn btn-primary">Submit Report</a>
+    <a href="/reports" class="btn btn-secondary" style="margin-left: 0.5rem;">View All Reports</a>
+</div>
+{% endblock %}

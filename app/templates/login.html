@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Login — MARS Reporter{% endblock %}
+{% block content %}
+<div style="max-width: 400px; margin: 4rem auto;">
+    <div class="card">
+        <h2>Login</h2>
+        {% if error %}
+            <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+        <form method="POST" action="/login">
+            <label for="callsign">Callsign</label>
+            <input type="text" id="callsign" name="callsign" placeholder="AAR4XX" required autofocus>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit" class="btn btn-primary" style="width:100%">Login</button>
+        </form>
+        <p style="margin-top: 1rem; font-size: 0.85rem; text-align: center;">
+            Don't have an account? <a href="/register" style="color: #e94560;">Register here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

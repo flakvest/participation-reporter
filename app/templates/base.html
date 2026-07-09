@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MARS Reporter{% endblock %}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+        nav { background: #1a1a2e; color: #fff; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        nav .brand { font-weight: 700; font-size: 1.1rem; color: #e94560; }
+        nav a { color: #a8a8b8; text-decoration: none; font-size: 0.9rem; }
+        nav a:hover { color: #fff; }
+        nav .spacer { flex: 1; }
+        nav .user-info { font-size: 0.85rem; color: #a8a8b8; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; }
+        .card h2 { margin-bottom: 1rem; color: #1a1a2e; }
+        .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-primary:hover { background: #d63851; }
+        .btn-secondary { background: #16213e; color: #fff; }
+        .btn-secondary:hover { background: #1a1a2e; }
+        .btn-outline { background: transparent; color: #e94560; border: 2px solid #e94560; }
+        .btn-outline:hover { background: #e94560; color: #fff; }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+        form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; color: #333; }
+        form input, form select, form textarea { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; margin-bottom: 1rem; }
+        form textarea { font-family: 'Courier New', monospace; font-size: 0.85rem; }
+        .alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; }
+        .alert-error { background: #ffe0e0; color: #c0392b; border: 1px solid #f5c6cb; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        table th { background: #1a1a2e; color: #fff; padding: 0.6rem 0.75rem; text-align: left; font-weight: 600; }
+        table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #eee; }
+        table tr:hover { background: #f8f9fa; }
+        .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-ok { background: #d4edda; color: #155724; }
+        .badge-no { background: #f8d7da; color: #721c24; }
+        .badge-missing { background: #fff3cd; color: #856404; }
+        .badge-plt { background: #cce5ff; color: #004085; }
+        .filters { display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap; margin-bottom: 1rem; }
+        .filters .filter-group { display: flex; flex-direction: column; gap: 0.25rem; }
+        .filters .filter-group label { font-size: 0.75rem; font-weight: 600; color: #666; margin-bottom: 0; }
+        .filters .filter-group select, .filters .filter-group input { padding: 0.4rem 0.6rem; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 0; width: auto; min-width: 120px; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .summary-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.25rem; text-align: center; }
+        .summary-card .number { font-size: 2rem; font-weight: 700; color: #1a1a2e; }
+        .summary-card .label { font-size: 0.8rem; color: #666; margin-top: 0.25rem; }
+        .submit-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .submit-methods { grid-template-columns: 1fr; } }
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; }
+        .status-card { display: flex; align-items: center; gap: 0.75rem; background: #fff; border-radius: 8px; padding: 0.75rem 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .status-card .indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .status-card .indicator.green { background: #28a745; }
+        .status-card .indicator.yellow { background: #ffc107; }
+        .status-card .indicator.red { background: #dc3545; }
+        .status-card .callsign { font-weight: 700; font-size: 0.95rem; min-width: 70px; }
+        .status-card .platoon { font-size: 0.75rem; color: #666; }
+        .status-card .detail { font-size: 0.8rem; color: #666; margin-left: auto; }
+        .strip-preview { background: #1a1a2e; color: #a8e6cf; padding: 0.75rem; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.8rem; overflow-x: auto; margin: 0.5rem 0; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="brand">MARS Reporter</span>
+        {% if user %}
+            <a href="/dashboard">Dashboard</a>
+            <a href="/submit">Submit</a>
+            <a href="/reports">Reports</a>
+            <span class="spacer"></span>
+            <span class="user-info">{{ user.callsign }} ({{ user.platoon }})</span>
+            <a href="/logout">Logout</a>
+        {% endif %}
+    </nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

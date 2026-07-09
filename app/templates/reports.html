@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Reports — MARS Reporter{% endblock %}
+{% block content %}
+<h1 style="margin-bottom: 0.5rem;">Submitted Reports</h1>
+<p style="color: #666; margin-bottom: 1rem;">View and filter submitted platoon participation reports.</p>
+
+<div class="card">
+    <form method="GET" action="/reports">
+        <div class="filters">
+            <div class="filter-group">
+                <label>Platoon</label>
+                <select name="platoon">
+                    <option value="">All</option>
+                    {% for p in platoons %}
+                    <option value="{{ p }}" {% if filter_platoon == p %}selected{% endif %}>{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Month</label>
+                <select name="month">
+                    <option value="">All</option>
+                    {% for m in months %}
+                    <option value="{{ m }}" {% if filter_month == m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Callsign</label>
+                <input type="text" name="callsign" placeholder="AAR4XX" value="{{ filter_callsign }}">
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+                <a href="/reports" class="btn btn-outline btn-sm">Clear</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if reports %}
+<div class="card" style="overflow-x: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <span style="font-size: 0.85rem; color: #666;">{{ reports|length }} report(s)</span>
+        <a href="/reports/export?platoon={{ filter_platoon }}&month={{ filter_month }}&callsign={{ filter_callsign }}" class="btn btn-outline btn-sm">Export CSV</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Platoon</th>
+                <th>Callsign</th>
+                <th>Month</th>
+                <th>Equip OK</th>
+                <th>Skills OK</th>
+                <th>HF Hrs</th>
+                <th>J0G Hrs</th>
+                <th>GST Hrs</th>
+                <th>Other HF</th>
+                <th>Total MARS</th>
+                <th>Notes</th>
+                <th>Source</th>
+                <th>Submitted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reports %}
+            <tr>
+                <td><span class="badge badge-plt">{{ r.platoon }}</span></td>
+                <td><strong>{{ r.callsign }}</strong></td>
+                <td>{{ r.month }}</td>
+                <td><span class="badge {{ 'badge-ok' if r.equipment_ok == 'YES' else 'badge-no' }}">{{ r.equipment_ok }}</span></td>
+                <td><span class="badge {{ 'badge-ok' if r.skills_ok == 'YES' else 'badge-no' }}">{{ r.skills_ok }}</span></td>
+                <td>{{ r.total_hf_hours }}</td>
+                <td>{{ r.j0g_hours }}</td>
+                <td>{{ r.gst_hours }}</td>
+                <td>{{ r.other_hf_hours }}</td>
+                <td>{{ r.total_mars_hours }}</td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ r.notes }}">{{ r.notes or '—' }}</td>
+                <td>{{ r.submission_source }}</td>
+                <td style="font-size: 0.8rem; white-space: nowrap;">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p style="color: #666; text-align: center; padding: 2rem;">No reports found matching the current filters.</p>
+</div>
+{% endif %}
+{% endblock %}
